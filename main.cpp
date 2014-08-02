@@ -28,8 +28,25 @@ struct Bitmap {
   unsigned short* payload;
 };
 
-void bigEndianToLittleEndian(Bitmap &b) {
+unsigned char bitswap(unsigned char byte) {
+  unsigned char reverse_endian = 0x00;
+  unsigned char bit0, bit1, bit2, bit3, bit4, bit5, bit6, bit7;
+  bit0 = (byte && 0x01) > 0 ? 0x80 : 0x00;
+  bit1 = (byte && 0x02) > 0 ? 0x40 : 0x00;
+  bit2 = (byte && 0x04) > 0 ? 0x20 : 0x00;
+  bit3 = (byte && 0x08) > 0 ? 0x10 : 0x00;
+  bit4 = (byte && 0x10) > 0 ? 0x08 : 0x00;
+  bit5 = (byte && 0x20) > 0 ? 0x04 : 0x00;
+  bit6 = (byte && 0x40) > 0 ? 0x02 : 0x00;
+  bit7 = (byte && 0x80) > 0 ? 0x01 : 0x00;
+ 
+  reverse_endian = bit0 + bit1 + bit2 + bit3 + bit4 + bit5 + bit6 + bit7; 
 
+  return reverse_endian; 
+}
+
+void bigEndianToLittleEndian(Bitmap &b) {
+  
 }
 
 void generateMockPayload(unsigned short* pixelArray, const unsigned &size) {
