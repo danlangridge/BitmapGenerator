@@ -18,7 +18,9 @@ enum SizeInBytes {
   DOUBLE = 8
 };
 
-unsigned char HEADER[14] = { 0x42, 0x4D, // 'B' 'M' 
+const unsigned char HEADER_SIZE = 14;
+
+unsigned char HEADER[HEADER_SIZE] = { 0x42, 0x4D, // 'B' 'M' 
                              0x00, 0x00, // Size in Bytes
                              0x00, 0x00, // 
                              0x01, 0x01, // reserved
@@ -27,9 +29,28 @@ unsigned char HEADER[14] = { 0x42, 0x4D, // 'B' 'M'
                              0x04, 0x04
                            };
 
+
 struct Bitmap {
   unsigned char* header;
   unsigned short* payload;
+  unsigned int payloadSize;
+  SizeInBytes pixelSize;
+
+  Bitmap (int pixelSize) {
+    header = HEADER;
+    pixelSize = SHORT; 
+    payloadSize = 50;
+    payload = new unsigned short[payloadSize*pixelSize];
+    
+    generateMockPayload();
+  } 
+  
+  void generateMockPayload() {
+    for (unsigned i = 0; i < payloadSize; i++) {
+      payload[i] = 16; 
+    }
+  }
+
 };
 
 unsigned char swapEndian(unsigned char byte) {
@@ -57,19 +78,12 @@ void outputByte(unsigned char byte) {
   cout << endl;
 }
 
-
 void bigEndianToLittleEndian(Bitmap &b) {
   
 }
 
-void generateMockPayload(unsigned short* pixelArray, const unsigned &size) {
-  for (unsigned i = 0; i < size; i++) {
-    pixelArray[i] = 16; 
-  }
-}
-
 void endianSwapTest() {
-  unsigned char test1 = 128;  
+  unsigned char test1 = 35;  
 
   for (unsigned i = 0; i < BITS_IN_BYTE; i++) {
     outputByte(test1 >> i);
