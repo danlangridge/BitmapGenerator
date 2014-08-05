@@ -45,16 +45,26 @@ struct Bitmap {
     generateMockPayload();
   } 
   
+  Bitmap (int pixelSize, int PayloadSize) {
+    HEADER[5] = payloadSize;   
+    header = HEADER;
+    pixelSize = SHORT; 
+    payloadSize = PayloadSize;
+     
+    payload = new unsigned short[payloadSize*pixelSize];
+    
+    generateMockPayload();
+  } 
+  
   void generateMockPayload() {
     for (unsigned i = 0; i < payloadSize; i++) {
       payload[i] = 16; 
     }
   }
-
 };
 
-unsigned char swapEndian(unsigned char byte) {
-  unsigned char reverse_endian = 0x00;
+unsigned char swapByte(unsigned char byte) {
+  unsigned char reverse_byte = 0x00;
   unsigned char bit0, bit1, bit2, bit3, bit4, bit5, bit6, bit7;
   bit0 = (byte & 0x01) > 0 ? 0x80 : 0x00;
   bit1 = (byte & 0x02) > 0 ? 0x40 : 0x00;
@@ -65,9 +75,9 @@ unsigned char swapEndian(unsigned char byte) {
   bit6 = (byte & 0x40) > 0 ? 0x02 : 0x00;
   bit7 = (byte & 0x80) > 0 ? 0x01 : 0x00;
  
-  reverse_endian = bit0 + bit1 + bit2 + bit3 + bit4 + bit5 + bit6 + bit7; 
+  reverse_byte = bit0 + bit1 + bit2 + bit3 + bit4 + bit5 + bit6 + bit7; 
 
-  return reverse_endian; 
+  return reverse_byte; 
 }
 
 void outputByte(unsigned char byte) {
@@ -87,15 +97,24 @@ void endianSwapTest() {
 
   for (unsigned i = 0; i < BITS_IN_BYTE; i++) {
     outputByte(test1 >> i);
-    cout << "Little-Endian: ";
-    outputByte(swapEndian(test1 >> i)); 
+    cout << "Reversed: ";
+    outputByte(swapByte(test1 >> i)); 
   }
 }
 
 void generateBMP() {
   ofstream bitfile;
+
+  unsigned char MOCK_HEADER[14] = { 0x42, 0x4D, // 'B' 'M' 
+                             0x00, 0x00, // Size in Bytes
+                             0x00, 0x01, // 
+                             0x01, 0x01, // reserved
+                             0x02, 0x02, // reserved
+                             0x04, 0x04, // offset of pixel array
+                             0x04, 0x04
+                           };
   bitfile.open("example.bmp");
-    
+ 
   bitfile.close();
 }
 
