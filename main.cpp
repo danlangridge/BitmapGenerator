@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -15,45 +16,29 @@ enum SizeInBytes {
   CHAR = 1,
   SHORT = 2,
   LONG = 4,
-  DOUBLE = 8
+  LONGLONG = 8
 };
 
 const unsigned char HEADER_SIZE = 14;
 
-unsigned char HEADER[HEADER_SIZE] = { 0x42, 0x4D, // 'B' 'M' 
-                             0x00, 0x00, // Size in Bytes
-                             0x00, 0x00, // 
-                             0x01, 0x01, // reserved
-                             0x02, 0x02, // reserved
-                             0x04, 0x04, // offset of pixel array
-                             0x04, 0x04
-                           };
+
+const char FILETYPE[2] = { 0x42, 0x4D }; 
 
 
 struct Bitmap {
-  unsigned char* header;
-  unsigned short* payload;
-  unsigned int payloadSize;
+  char* header;
+  long* payload;
+  char payloadSize;
   SizeInBytes pixelSize;
-
-  Bitmap (int pixelSize) {
-    header = HEADER;
-    pixelSize = SHORT; 
-    payloadSize = 50;
-    payload = new unsigned short[payloadSize*pixelSize];
-    
-    generateMockPayload();
-  } 
-  
-  Bitmap (int pixelSize, int PayloadSize) {
-    HEADER[5] = payloadSize;   
-    header = HEADER;
-    pixelSize = SHORT; 
+ 
+  Bitmap (SizeInBytes pixelSize, int PayloadSize) {
+    pixelSize = pixelSize; 
     payloadSize = PayloadSize;
      
-    payload = new unsigned short[payloadSize*pixelSize];
+    payload = new long[payloadSize*pixelSize];
     
     generateMockPayload();
+    generateHeader();
   } 
   
   void generateMockPayload() {
@@ -61,6 +46,25 @@ struct Bitmap {
       payload[i] = 16; 
     }
   }
+
+  void generateHeader() {
+    if (header != NULL) {
+      free(header);
+    }
+    
+    header = new char[HEADER_SIZE];
+
+    header[0] = 0x42; //B
+    header[1] = 0x4D; //M
+    header[2] = payloadSize;
+    
+    //Byte offset to payload
+    header[10] = 0x0E;
+    header[11] = 0x00;
+    header[12] = 0x00;
+    header[13] = 0x00;
+  }
+
 };
 
 unsigned char swapByte(unsigned char byte) {
@@ -88,7 +92,7 @@ void outputByte(unsigned char byte) {
   cout << endl;
 }
 
-void bigEndianToLittleEndian(Bitmap &b) {
+void BigEndianToLittleEndian(Bitmap &b) {
   
 }
 
@@ -104,15 +108,6 @@ void endianSwapTest() {
 
 void generateBMP() {
   ofstream bitfile;
-
-  unsigned char MOCK_HEADER[14] = { 0x42, 0x4D, // 'B' 'M' 
-                             0x00, 0x00, // Size in Bytes
-                             0x00, 0x01, // 
-                             0x01, 0x01, // reserved
-                             0x02, 0x02, // reserved
-                             0x04, 0x04, // offset of pixel array
-                             0x04, 0x04
-                           };
   bitfile.open("example.bmp");
  
   bitfile.close();
