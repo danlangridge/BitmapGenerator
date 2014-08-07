@@ -54,9 +54,9 @@ struct Bitmap {
     
     header = new char[HEADER_SIZE];
 
-    header[0] = 0x42; //B
-    header[1] = 0x4D; //M
-    header[2] = payloadSize;
+    header[0] = FILETYPE[0]; //B
+    header[1] = FILETYPE[1]; //M
+    header[2] = payloadSize*pixelSize;
     
     //Byte offset to payload
     header[10] = 0x0E;
@@ -106,10 +106,21 @@ void endianSwapTest() {
   }
 }
 
-void generateBMP() {
+void writeBMP(ofstream &bitfile, Bitmap *bmp) {
+  for (unsigned i = 0; i < HEADER_SIZE; i++) {
+    //bitfile.write(bmp->header[i], 1);
+  }
+  for (unsigned i = 0; i < bmp->payloadSize; i++) {
+    //bitfile.write(bmp->payload[i], bmp->pixelSize); 
+  } 
+}
+
+
+void generateBMPTest() {
   ofstream bitfile;
   bitfile.open("example.bmp");
- 
+  Bitmap* bmp = new Bitmap(SHORT, 10); 
+  writeBMP(bitfile, bmp); 
   bitfile.close();
 }
 
