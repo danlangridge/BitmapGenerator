@@ -64,6 +64,16 @@ struct Bitmap {
     header[12] = 0x00;
     header[13] = 0x00;
   }
+  
+  char* splitPayloadIntoBytes() {
+    char* payloadBytes = new char[payloadSize*pixelSize]; 
+    for (unsigned i = 0; i < payloadSize*pixelSize; i++) {
+      for (unsigned byte = pixelSize - 1 ; byte >= 0; byte--) { 
+        payloadBytes[i] = payload[i] & (0xFF << byte);  
+      } 
+    }
+    return payloadBytes; 
+  }
 
 };
 
@@ -106,12 +116,13 @@ void endianSwapTest() {
   }
 }
 
+
 void writeBMP(ofstream &bitfile, Bitmap *bmp) {
   for (unsigned i = 0; i < HEADER_SIZE; i++) {
-    //bitfile.write(bmp->header[i], 1);
+    bitfile.write((const char*)bmp->header[i], 1);
   }
   for (unsigned i = 0; i < bmp->payloadSize; i++) {
-    //bitfile.write(bmp->payload[i], bmp->pixelSize); 
+    bitfile.write((const char*)bmp->payload[i], bmp->pixelSize); 
   } 
 }
 
