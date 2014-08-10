@@ -3,6 +3,7 @@
 #include <string>
 #include <stdlib.h>
 
+
 using namespace std;
 
 /* 
@@ -10,7 +11,7 @@ using namespace std;
 */
 
 const unsigned char BITS_IN_BYTE = 8; 
-
+static char LOG = 1;
 
 enum SizeInBytes {
   CHAR = 1,
@@ -21,9 +22,7 @@ enum SizeInBytes {
 
 const unsigned char HEADER_SIZE = 14;
 
-
 const char FILETYPE[2] = { 0x42, 0x4D }; 
-
 
 struct Bitmap {
   char* header;
@@ -106,7 +105,7 @@ void BigEndianToLittleEndian(Bitmap &b) {
   
 }
 
-void endianSwapTest() {
+void byteSwapTest() {
   unsigned char test1 = 35;  
 
   for (unsigned i = 0; i < BITS_IN_BYTE; i++) {
@@ -116,16 +115,21 @@ void endianSwapTest() {
   }
 }
 
+void logDebug(string log) {
+  if (LOG) cout << log << endl;
+  cout.flush();
+}
 
 void writeBMP(ofstream &bitfile, Bitmap *bmp) {
   for (unsigned i = 0; i < HEADER_SIZE; i++) {
-    bitfile.write((const char*)bmp->header[i], 1);
+    logDebug("HeaderByte: " + bmp->header[i]); 
+    //bitfile.write((const char)bmp->header[i], 1);
   }
   for (unsigned i = 0; i < bmp->payloadSize; i++) {
-    bitfile.write((const char*)bmp->payload[i], bmp->pixelSize); 
+    logDebug("payloadByte: " + bmp->payload[i]); 
+    //bitfile.write((const char*)bmp->payload[i], bmp->pixelSize); 
   } 
 }
-
 
 void generateBMPTest() {
   ofstream bitfile;
@@ -136,6 +140,7 @@ void generateBMPTest() {
 }
 
 int main(int argv, char** argc) {
-  endianSwapTest();
+  //byteSwapTest();
+  generateBMPTest(); 
   return 0;
 }
