@@ -24,6 +24,27 @@ const unsigned char HEADER_SIZE = 14;
 
 const char FILETYPE[2] = { 0x42, 0x4D }; 
 
+/*-- LOGGING FUNCTIONS --*/
+
+void outputByte(char byte) {
+  for (unsigned i = 0; i < BITS_IN_BYTE; i++)
+    cout << ((byte & (0x80 >> i)) > 0) ? "1" : "0";  
+}
+
+string byteToString(char byte) {
+  string sByte = ""; 
+  for (unsigned i = 0; i < BITS_IN_BYTE; i++)
+    sByte += ((byte & (0x80 >> i)) > 0) ? "1" : "0";  
+  return sByte;
+}
+
+void logDebug(string log) {
+  if (LOG) cout << log << endl;
+  cout.flush();
+}
+
+/*-- BITMAP CLASS --*/
+
 struct Bitmap {
   char* header;
   long* payload;
@@ -76,6 +97,8 @@ struct Bitmap {
 
 };
 
+/*-- HELPER FUNCTIONS --*/
+
 unsigned char swapByte(unsigned char byte) {
   unsigned char reverse_byte = 0x00;
   unsigned char bit0, bit1, bit2, bit3, bit4, bit5, bit6, bit7;
@@ -93,17 +116,22 @@ unsigned char swapByte(unsigned char byte) {
   return reverse_byte; 
 }
 
-void outputByte(unsigned char byte) {
-  cout << "Byte: ";
-  for (unsigned i = 0; i < BITS_IN_BYTE; i++)
-    cout << ((byte & (0x80 >> i)) > 0) ? "1" : "0";
-  
-  cout << endl;
-}
-
 void BigEndianToLittleEndian(Bitmap &b) {
   
 }
+
+void writeBMP(ofstream &bitfile, Bitmap *bmp) {
+  for (unsigned i = 0; i < HEADER_SIZE; i++) {
+    logDebug("Header: " + byteToString(bmp->header[i]));
+    //bitfile.write((const char)bmp->header[i], 1);
+  }
+  for (unsigned i = 0; i < bmp->payloadSize; i++) {
+    logDebug("payloadByte: " + byteToString(bmp->payload[i]));
+    //bitfile.write((const char*)bmp->payload[i], bmp->pixelSize); 
+  } 
+}
+
+/*-- TEST FUNCTIONS --*/
 
 void byteSwapTest() {
   unsigned char test1 = 35;  
@@ -113,22 +141,6 @@ void byteSwapTest() {
     cout << "Reversed: ";
     outputByte(swapByte(test1 >> i)); 
   }
-}
-
-void logDebug(string log) {
-  if (LOG) cout << log << endl;
-  cout.flush();
-}
-
-void writeBMP(ofstream &bitfile, Bitmap *bmp) {
-  for (unsigned i = 0; i < HEADER_SIZE; i++) {
-    logDebug("HeaderByte: " + bmp->header[i]); 
-    //bitfile.write((const char)bmp->header[i], 1);
-  }
-  for (unsigned i = 0; i < bmp->payloadSize; i++) {
-    logDebug("payloadByte: " + bmp->payload[i]); 
-    //bitfile.write((const char*)bmp->payload[i], bmp->pixelSize); 
-  } 
 }
 
 void generateBMPTest() {
