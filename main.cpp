@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <stdlib.h>
+#include <time.h>
 
 
 using namespace std;
@@ -47,7 +48,7 @@ void logDebug(string log) {
 
 struct Bitmap {
   char* header;
-  long* payload;
+  char* payload;
   char payloadSize;
   SizeInBytes pixelSize;
  
@@ -55,14 +56,14 @@ struct Bitmap {
     pixelSize = pixelSize; 
     payloadSize = PayloadSize;
      
-    payload = new long[payloadSize*pixelSize];
+    payload = new char[payloadSize*pixelSize];
     
     generateMockPayload();
     generateHeader();
   } 
   
   void generateMockPayload() {
-    for (unsigned i = 0; i < payloadSize; i++) {
+    for (unsigned i = 0; i < payloadSize*pixelSize; i++) {
       payload[i] = 16; 
     }
   }
@@ -121,25 +122,21 @@ void BigEndianToLittleEndian(Bitmap &b) {
 }
 
 void writeBMP(ofstream &bitfile, Bitmap *bmp) {
-  for (unsigned i = 0; i < HEADER_SIZE; i++) {
-    logDebug("Header: " + byteToString(bmp->header[i]));
-    //bitfile.write((const char)bmp->header[i], 1);
-  }
-  for (unsigned i = 0; i < bmp->payloadSize; i++) {
-    logDebug("payloadByte: " + byteToString(bmp->payload[i]));
-    //bitfile.write((const char*)bmp->payload[i], bmp->pixelSize); 
-  } 
+    //logDebug("Header: " + byteToString(bmp->header[i]));
+    bitfile.write((const char*)bmp->header, HEADER_SIZE);
+    //logDebug("payloadByte: " + byteToString(bmp->payload[i]));
+    bitfile.write((const char*)bmp->payload, bmp->pixelSize*bmp->payloadSize); 
 }
 
 /*-- TEST FUNCTIONS --*/
 
 void byteSwapTest() {
-  unsigned char test1 = 35;  
+  unsigned char test = rand() % 256;  
 
   for (unsigned i = 0; i < BITS_IN_BYTE; i++) {
-    outputByte(test1 >> i);
+    outputByte(test >> i);
     cout << "Reversed: ";
-    outputByte(swapByte(test1 >> i)); 
+    outputByte(swapByte(test >> i)); 
   }
 }
 
