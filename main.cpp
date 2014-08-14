@@ -14,6 +14,15 @@ using namespace std;
 const unsigned char BITS_IN_BYTE = 8; 
 static char LOG = 1;
 
+enum FileStructure {
+  BM = 1,
+  BA = 2,
+  CI = 3,
+  CP = 4,
+  IC = 5,
+  PT = 6
+};
+
 enum SizeInBytes {
   CHAR = 1,
   SHORT = 2,
@@ -48,6 +57,7 @@ void logDebug(string log) {
 
 struct Bitmap {
   char* header;
+  char* dibHeader; 
   char* payload;
   char payloadSize;
   SizeInBytes pixelSize;
@@ -77,13 +87,17 @@ struct Bitmap {
 
     header[0] = FILETYPE[0]; //B
     header[1] = FILETYPE[1]; //M
-    header[2] = payloadSize*pixelSize;
-    
+    header[2] = payloadSize*pixelSize + HEADER_SIZE + 1;
+    // Pixel Gap Artifact 
     //Byte offset to payload
-    header[10] = 0x0E;
+    header[10] = 0x00;
     header[11] = 0x00;
     header[12] = 0x00;
-    header[13] = 0x00;
+    header[13] = HEADER_SIZE;
+    
+    dibHeader = new char[1];
+   
+    
   }
   
   char* splitPayloadIntoBytes() {
