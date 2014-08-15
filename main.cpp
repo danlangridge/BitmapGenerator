@@ -96,7 +96,6 @@ struct Bitmap {
     header[13] = HEADER_SIZE;
     
     dibHeader = new char[1];
-   
     
   }
   
@@ -109,7 +108,6 @@ struct Bitmap {
     }
     return payloadBytes; 
   }
-
 };
 
 /*-- HELPER FUNCTIONS --*/
@@ -131,8 +129,21 @@ unsigned char swapByte(unsigned char byte) {
   return reverse_byte; 
 }
 
-void BigEndianToLittleEndian(Bitmap &b) {
-  
+inline void swapIntegerEndian(char* integerArray, int size, int byteSize) {
+  for (unsigned i = 0; i < size; i++) {
+    for (unsigned j = 0; j < byteSize/2; j++) {
+      int temp1 = integerArray[i + j]; 
+      integerArray[i + j] = integerArray[i + byteSize - j]; 
+    } 
+  }
+}
+
+void swapHeaderEndian(Bitmap* b) {
+}
+
+void BigEndianToLittleEndian(Bitmap* b) {  
+  swapHeaderEndian(b);   
+  swapIntegerEndian(b->payload, b->payloadSize, b->pixelSize); 
 }
 
 void writeBMP(ofstream &bitfile, Bitmap *bmp) {
