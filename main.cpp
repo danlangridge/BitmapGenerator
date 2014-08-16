@@ -31,6 +31,7 @@ enum SizeInBytes {
 };
 
 const unsigned char HEADER_SIZE = 14;
+const unsigned char DIB_HEADER_SIZE = 12;
 
 const char FILETYPE[2] = { 0x42, 0x4D }; 
 
@@ -57,7 +58,7 @@ void logDebug(string log) {
 
 struct Bitmap {
   char* header;
-  char* dibHeader; 
+  char* dibHeader; //OS/2.1 BITMAPCORE Header 
   char* payload;
   char payloadSize;
   SizeInBytes pixelSize;
@@ -69,7 +70,7 @@ struct Bitmap {
     payload = new char[payloadSize*pixelSize];
     
     generateMockPayload();
-    generateHeader();
+    generateHeaders();
   } 
   
   void generateMockPayload() {
@@ -78,7 +79,7 @@ struct Bitmap {
     }
   }
 
-  void generateHeader() {
+  void generateHeaders() {
     if (header != NULL) {
       free(header);
     }
@@ -95,8 +96,12 @@ struct Bitmap {
     header[12] = 0x00;
     header[13] = HEADER_SIZE;
     
-    dibHeader = new char[1];
-    
+    dibHeader = new char[10];
+    dibHeader[3] = 0x0C; // Size of DIB Header
+    dibHeader[5] = pixelSize*payloadSize/2; // pixel Width 
+    dibHeader[7] = pixelSize*payloadSize/2; // pixel Height 
+    dibHeader[9] = 0x01; // Number of Color Planes
+    dibHeader[11] = pixelSize*BITS_IN_BYTE ; // pixel Size in Bits  
   }
   
   char* splitPayloadIntoBytes() {
@@ -149,6 +154,7 @@ void BigEndianToLittleEndian(Bitmap* b) {
 void writeBMP(ofstream &bitfile, Bitmap *bmp) {
     //logDebug("Header: " + byteToString(bmp->header[i]));
     bitfile.write((const char*)bmp->header, HEADER_SIZE);
+    bitfile.write((const char*)bmp->dibHeader, DIB_HEADER_SIZE);
     //logDebug("payloadByte: " + byteToString(bmp->payload[i]));
     bitfile.write((const char*)bmp->payload, bmp->pixelSize*bmp->payloadSize); 
 }
