@@ -54,6 +54,33 @@ void logDebug(string log) {
   cout.flush();
 }
 
+void swapNodes(char* byteArray, unsigned indexI, unsigned indexJ) {
+  char tempd = byteArray[indexI];
+  byteArray[indexI] = byteArray[indexJ];
+  byteArray[indexJ] = tempd;   
+  return;  
+}
+
+unsigned traverseToParent(unsigned currentNode) {
+  if (currentNode == 1) return currentNode; 
+  return currentNode/2; 
+}
+
+unsigned getParent(char* byteArray, unsigned currentNode) {
+  return byteArray[currentNode/2];
+}
+
+char* buildBinaryTree(char* byteArray) {
+  char* binaryTree = new char[sizeof(byteArray)];
+  
+  return new char();
+}
+
+char* huffmanEncoding(char* byteArray) {
+ char* buildBinaryTree(byteArray); 
+  return new char();
+} 
+
 /*-- BITMAP CLASS --*/
 
 struct Bitmap {
